@@ -101,7 +101,7 @@ Reference tables: [REF_developer-reference.md](./REF_developer-reference.md).
 
 | Job | Python matrix | Depends on | Runs when |
 |-----|--------------|------------|-----------|
-| `unit-tests` | 3.8 – 3.12 | — | Every push / PR to `dev` |
+| `unit-tests` | 3.9 – 3.12 | — | Every push / PR to `dev` |
 | `integration-tests` | 3.11 only | `unit-tests` pass | Same trigger; skipped if secrets absent (forks) |
 
 ### Secret → Env Var Mapping

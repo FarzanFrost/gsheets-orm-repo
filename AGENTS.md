@@ -6,7 +6,7 @@
 - **Project Name**: gsheets-orm
 - **Version**: 0.1.7 — use bump script only, never manually edit
 - **Status**: Active
-- **Tech Stack**: Python 3.8+, pip, Google Sheets API
+- **Tech Stack**: Python 3.9+, pip, Google Sheets API
 - **Context Anchors**: None
 
 ## Documentation Priority
