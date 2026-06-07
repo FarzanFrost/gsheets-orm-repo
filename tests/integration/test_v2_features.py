@@ -31,20 +31,20 @@ def setup_teardown(live_session):
         live_session.dialect.fetch_worksheet_data("Assignments")
         # Clear existing data except headers if any
         headers = list(AssignmentLocal._columns.keys())
-        live_session.dialect.client.open_by_key(live_session.dialect.spreadsheet_id).worksheet("Assignments").clear()
+        live_session.dialect.engine.spreadsheet.worksheet("Assignments").clear()
         live_session.dialect.append_rows("Assignments", [headers])
     except Exception:
         # Create sheet
         headers = list(AssignmentLocal._columns.keys())
-        sheet = live_session.dialect.client.open_by_key(live_session.dialect.spreadsheet_id).add_worksheet(title="Assignments", rows="100", cols="20")
+        sheet = live_session.dialect.engine.spreadsheet.add_worksheet(title="Assignments", rows="100", cols="20")
         sheet.append_row(headers)
     
     yield
     
     # Teardown: delete the Assignments tab to clean up
     try:
-        sheet = live_session.dialect.client.open_by_key(live_session.dialect.spreadsheet_id).worksheet("Assignments")
-        live_session.dialect.client.open_by_key(live_session.dialect.spreadsheet_id).del_worksheet(sheet)
+        sheet = live_session.dialect.engine.spreadsheet.worksheet("Assignments")
+        live_session.dialect.engine.spreadsheet.del_worksheet(sheet)
     except Exception:
         pass
 
