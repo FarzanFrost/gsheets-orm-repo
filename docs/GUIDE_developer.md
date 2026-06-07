@@ -129,4 +129,4 @@ Without those vars set, integration tests self-skip via `pytestmark`.
 
 ---
 
-*v0.1.0 — 2026-06-06*
+*v0.1.1 — 2026-06-07*

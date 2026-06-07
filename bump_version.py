@@ -43,8 +43,14 @@ def update_file(filepath, old_version, new_version, today_str):
             f'*v{new_version} — {today_str}*',
             updated_content
         )
+        # e.g. - **Version**: 0.1.0 —
+        updated_content = re.sub(
+            r'- \*\*Version\*\*:\s*' + re.escape(old_version) + r'\s*—',
+            f'- **Version**: {new_version} —',
+            updated_content
+        )
     # Special replacement for docs/
-    elif filepath.startswith("docs/"):
+    elif filepath.replace("\\", "/").startswith("docs/"):
         # e.g. *v0.1.0 — 2026-06-06*
         updated_content = re.sub(
             r'\*v' + re.escape(old_version) + r' — \d{4}-\d{2}-\d{2}\*',
