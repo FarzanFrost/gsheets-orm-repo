@@ -60,6 +60,18 @@ class Query:
             elif op == ">=":
                 if not (actual >= expected):
                     return False
+            elif op == "contains":
+                if expected not in (actual or ""):
+                    return False
+            elif op == "startswith":
+                if not (actual or "").startswith(expected):
+                    return False
+            elif op == "endswith":
+                if not (actual or "").endswith(expected):
+                    return False
+            elif op == "like":
+                if expected.lower() not in (actual or "").lower():
+                    return False
             else:
                 return False
 

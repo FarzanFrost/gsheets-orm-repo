@@ -32,7 +32,7 @@
 | `Column` | Descriptor (`__get__`, `__set__`, `__set_name__`) | Tracks per-instance values in `_values` dict |
 | `ForeignKey` | Metadata marker on `Column` | Resolved by `RelationshipDescriptor` at access time |
 | `Base` | `__init_subclass__` hook | Registers `__tablename__` → class in global `_registry` |
-| `BinaryExpression` | Operator overload return type | Used by `Query.filter()` for lazy evaluation |
+| `BinaryExpression` | Operator overload return type | Used by `Query.filter()` for lazy evaluation. Supported operators: `==`, `!=`, `<`, `<=`, `>`, `>=`, `contains`, `startswith`, `endswith`, `like` (case-insensitive substring). String operators are None-safe — a `None` column value is treated as `""`. |
 | `RelationshipDescriptor` | Descriptor, lazy-loads via `Session.query()` | Detects M:1 vs 1:M by inspecting FK direction. Cannot be passed as a kwarg to `__init__` — must be assigned post-construction (`instance.rel = value`) |
 
 ### State Registry

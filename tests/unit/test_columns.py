@@ -40,6 +40,32 @@ def test_column_operator_overloads():
     assert expr2.operator == "!="
     assert expr2.value == "Bob"
 
+def test_column_string_operators():
+    # contains
+    expr = MockModel.name.contains("ice")
+    assert isinstance(expr, BinaryExpression)
+    assert expr.column == MockModel.name
+    assert expr.operator == "contains"
+    assert expr.value == "ice"
+
+    # startswith
+    expr2 = MockModel.name.startswith("Al")
+    assert isinstance(expr2, BinaryExpression)
+    assert expr2.operator == "startswith"
+    assert expr2.value == "Al"
+
+    # endswith
+    expr3 = MockModel.name.endswith("ce")
+    assert isinstance(expr3, BinaryExpression)
+    assert expr3.operator == "endswith"
+    assert expr3.value == "ce"
+
+    # like (case-insensitive)
+    expr4 = MockModel.name.like("ALICE")
+    assert isinstance(expr4, BinaryExpression)
+    assert expr4.operator == "like"
+    assert expr4.value == "ALICE"
+
 def test_foreign_key_definition():
     fk = ForeignKey("Department.dept_id")
     assert fk.column_ref == "Department.dept_id"

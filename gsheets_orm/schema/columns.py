@@ -94,5 +94,18 @@ class Column:
     def __ge__(self, other: Any) -> BinaryExpression:
         return BinaryExpression(self, ">=", other)
 
+    def contains(self, value: str) -> BinaryExpression:
+        return BinaryExpression(self, "contains", value)
+
+    def startswith(self, value: str) -> BinaryExpression:
+        return BinaryExpression(self, "startswith", value)
+
+    def endswith(self, value: str) -> BinaryExpression:
+        return BinaryExpression(self, "endswith", value)
+
+    def like(self, value: str) -> BinaryExpression:
+        """Case-insensitive substring match."""
+        return BinaryExpression(self, "like", value)
+
     def __repr__(self) -> str:
         return f"<Column: {self.name}>"
