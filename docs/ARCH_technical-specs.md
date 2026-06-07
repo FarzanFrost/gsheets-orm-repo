@@ -33,7 +33,7 @@
 | `ForeignKey` | Metadata marker on `Column` | Resolved by `RelationshipDescriptor` at access time |
 | `Base` | `__init_subclass__` hook | Registers `__tablename__` → class in global `_registry` |
 | `BinaryExpression` | Operator overload return type | Used by `Query.filter()` for lazy evaluation |
-| `RelationshipDescriptor` | Descriptor, lazy-loads via `Session.query()` | Detects M:1 vs 1:M by inspecting FK direction |
+| `RelationshipDescriptor` | Descriptor, lazy-loads via `Session.query()` | Detects M:1 vs 1:M by inspecting FK direction. Cannot be passed as a kwarg to `__init__` — must be assigned post-construction (`instance.rel = value`) |
 
 ### State Registry
 
@@ -54,6 +54,7 @@
 - **Missing Worksheet**: `commit()` writes headers first if `fetch_worksheet_data` returns empty.
 - **Concurrent Overwrites**: `Session` performs read-before-write to resolve row numbers. No lock is held — last writer wins.
 - **Circular Relations**: `RelationshipDescriptor` does not detect cycles. Circular `relationship()` definitions will cause infinite recursion. See `STANDARDS_interface.md`.
+- **Identity Map Manual Clear**: `session._identity_map.clear()` is a valid pattern to force a live re-query (e.g., in tests). It does not reset `_new`, `_dirty`, or `_deleted` — only the cache of already-committed objects.
 
 ---
 

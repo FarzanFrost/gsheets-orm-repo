@@ -40,7 +40,7 @@
 
 > Only document cases that are non-obvious or have caused regressions.
 
-- **Circular References**: Throw error if query includes circular relation definitions.
+- **Circular References**: `RelationshipDescriptor` does **not** detect cycles. Circular `relationship()` definitions cause infinite recursion at access time. Avoid self-referencing or mutually recursive relationships unless only one side is accessed.
 
 ---
 
