@@ -1,6 +1,6 @@
 import time
 from typing import Any, Dict, List, Tuple
-from gspread.exceptions import APIError
+from gspread.exceptions import APIError, WorksheetNotFound
 from gsheets_orm.engine.base import Engine
 from gsheets_orm.exceptions import DialectError
 
@@ -35,11 +35,21 @@ class Dialect:
     def __init__(self, engine: Engine):
         self.engine = engine
 
+    def _get_or_create_worksheet(self, worksheet_name: str):
+        try:
+            return self.engine.spreadsheet.worksheet(worksheet_name)
+        except WorksheetNotFound:
+            return self.engine.spreadsheet.add_worksheet(
+                title=worksheet_name, rows=1000, cols=26
+            )
+
     @retry_on_rate_limit()
     def fetch_worksheet_data(self, worksheet_name: str) -> List[List[str]]:
         try:
             worksheet = self.engine.spreadsheet.worksheet(worksheet_name)
             return worksheet.get_all_values()
+        except WorksheetNotFound:
+            return []
         except DialectError:
             raise
         except Exception as e:
@@ -50,7 +60,7 @@ class Dialect:
         if not rows:
             return
         try:
-            worksheet = self.engine.spreadsheet.worksheet(worksheet_name)
+            worksheet = self._get_or_create_worksheet(worksheet_name)
             worksheet.append_rows(rows, value_input_option="USER_ENTERED")
         except DialectError:
             raise
