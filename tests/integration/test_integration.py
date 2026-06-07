@@ -3,7 +3,7 @@ import pytest
 from datetime import datetime
 from gsheets_orm import Base, Column, String, Integer, Float, Boolean, DateTime, ForeignKey, relationship, create_engine, Session
 
-# Check if integration test environment is available
+# Check if integration test environment is available]n=]=
 creds_path = os.getenv("GSHEETS_CREDENTIALS_PATH")
 spreadsheet_id = os.getenv("GSHEETS_SPREADSHEET_ID")
 run_integration = creds_path is not None and spreadsheet_id is not None
@@ -27,7 +27,7 @@ class TestUser(Base):
     name = Column(String)
     
     # Reverse relationship (1:M)
-    accounts = relationship("TestAccount", back_populates="owner", is_list=True)
+    accounts = relationship("TestAccount", back_populates="owner")
 
 class TestAccount(Base):
     __tablename__ = "IntegrationAccount"
