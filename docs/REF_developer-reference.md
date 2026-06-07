@@ -22,18 +22,20 @@
 
 | Command | Purpose |
 |---------|---------|
-| `npm run dev` | Local development |
-| `npm test` | Run tests |
-| `npm run build` | Production build |
-| `npm run bump` | Sync version across all files |
+| `pip install -e .` | Install package in editable development mode |
+| `pytest tests/unit/` | Run unit tests only |
+| `pytest tests/integration/ -v` | Run integration tests (requires `GSHEETS_CREDENTIALS_PATH` + `GSHEETS_SPREADSHEET_ID`) |
+| `pytest` | Run all tests; integration tests self-skip if env vars absent |
+| `python -m build` | Build distributions |
+| `python bump_version.py` | Sync version across all files |
 
 ### Version
 
 | Item | Detail |
 |------|--------|
-| Source of truth | `package.json` |
-| Bump command | `npm run bump` |
-| Files auto-updated | `package.json`, `AGENTS.md`, `docs/*.md` |
+| Source of truth | `setup.py` |
+| Bump command | `python bump_version.py` |
+| Files auto-updated | `setup.py`, `AGENTS.md`, `docs/*.md` |
 
 ### Google Sheets API Reference
 

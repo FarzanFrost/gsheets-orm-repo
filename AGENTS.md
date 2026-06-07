@@ -6,7 +6,7 @@
 - **Project Name**: gsheets-orm
 - **Version**: 0.1.0 — use bump script only, never manually edit
 - **Status**: Active
-- **Tech Stack**: TypeScript, Node.js, Google Sheets API
+- **Tech Stack**: Python 3.8+, pip, Google Sheets API
 - **Context Anchors**: None
 
 ## Documentation Priority
@@ -76,10 +76,10 @@ Code blocks, commit messages, PR descriptions: write normal always.
 - [ ] v0.1.0: Setup Living Docs architecture and initialize repository
 
 ## Commands
-- `npm run dev`: local development.
-- `npm test`: run tests.
-- `npm run build`: production build.
-- `npm run bump`: sync version across all files. Never manually edit version numbers.
+- `pip install -e .`: install in editable mode for local development.
+- `pytest`: run test suite.
+- `python -m build`: build source and binary distributions.
+- `python bump_version.py`: sync version across all files. Never manually edit version numbers.
 
 ## Project Notes
 > Initializing project.

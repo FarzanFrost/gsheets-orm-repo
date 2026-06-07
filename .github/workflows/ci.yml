@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+
+    - name: Run unit tests
+      run: |
+        pytest tests/unit/
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    # Only run if the secrets are present (skips on forks where secrets are unavailable)
+    if: ${{ secrets.GOOGLE_CREDENTIALS_JSON != '' }}
+    needs: unit-tests
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+
+    - name: Write credentials file
+      run: |
+        echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > /tmp/gsheets_credentials.json
+
+    - name: Run integration tests
+      env:
+        GSHEETS_CREDENTIALS_PATH: /tmp/gsheets_credentials.json
+        GSHEETS_SPREADSHEET_ID: ${{ secrets.TEST_SPREADSHEET_ID }}
+      run: |
+        pytest tests/integration/ -v

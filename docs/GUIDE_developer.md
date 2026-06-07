@@ -95,6 +95,34 @@ Reference tables: [REF_developer-reference.md](./REF_developer-reference.md).
 
 ---
 
+## CI Pipeline
+
+### Jobs
+
+| Job | Python matrix | Depends on | Runs when |
+|-----|--------------|------------|-----------|
+| `unit-tests` | 3.8 – 3.12 | — | Every push / PR to `dev` |
+| `integration-tests` | 3.11 only | `unit-tests` pass | Same trigger; skipped if secrets absent (forks) |
+
+### Secret → Env Var Mapping
+
+| GitHub Secret | Env Var set in CI | Read by |
+|---------------|-------------------|---------|
+| `GOOGLE_CREDENTIALS_JSON` | Written to `/tmp/gsheets_credentials.json`; path exported as `GSHEETS_CREDENTIALS_PATH` | `tests/integration/test_integration.py` |
+| `TEST_SPREADSHEET_ID` | `GSHEETS_SPREADSHEET_ID` | `tests/integration/test_integration.py` |
+
+### Running Integration Tests Locally
+
+```bash
+export GSHEETS_CREDENTIALS_PATH=/path/to/creds.json
+export GSHEETS_SPREADSHEET_ID=your_sheet_id
+pytest tests/integration/ -v
+```
+
+Without those vars set, integration tests self-skip via `pytestmark`.
+
+---
+
 ## Edge Cases
 
 - **Sheet API Rate Limit**: When hit, retry with exponential backoff.
