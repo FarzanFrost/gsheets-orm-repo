@@ -5,7 +5,7 @@ setup(
     version="0.1.0",
     author="FarzanFrost",
     description="A lightweight Object-Relational Mapper (ORM) backed by Google Sheets",
-    long_description=open("README.md").read() if open("README.md") else "",
+    long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/FarzanFrost/gsheets-orm-repo",
     packages=find_packages(exclude=["tests*", "docs*"]),
