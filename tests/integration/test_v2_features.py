@@ -52,7 +52,7 @@ def setup_teardown(live_session):
 def test_live_composite_keys_and_validation(live_session):
     # 1. Test Descriptor Regex Validation (Should fail locally before network call)
     with pytest.raises(ValueError, match="Regex mismatch"):
-        Assignment(project_id="P1", employee_id="E1", role_code="invalid-role")
+        Assignment(project_id="P1", employee_id="E1", role_code="abc")
     
     # 2. Test Composite PKs Live
     valid_assignment = Assignment(project_id="P1", employee_id="E1", role_code="DEV", hours=10)
