@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="gsheets-orm",
-    version="0.1.5",
+    version="0.1.6",
     author="FarzanFrost",
     description="A lightweight Object-Relational Mapper (ORM) backed by Google Sheets",
     long_description=open("README.md", encoding="utf-8").read(),

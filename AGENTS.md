@@ -1,10 +1,10 @@
-# Agent — gsheets-orm (v0.1.5) — 2026-06-07
+# Agent — gsheets-orm (v0.1.6) — 2026-06-07
 
 > **Strict Rule**: Read this file at every session start.
 
 ## Project Setup
 - **Project Name**: gsheets-orm
-- **Version**: 0.1.5 — use bump script only, never manually edit
+- **Version**: 0.1.6 — use bump script only, never manually edit
 - **Status**: Active
 - **Tech Stack**: Python 3.8+, pip, Google Sheets API
 - **Context Anchors**: None
@@ -86,4 +86,5 @@ Code blocks, commit messages, PR descriptions: write normal always.
 
 ---
 
-*v0.1.5 — 2026-06-07*
+*v0.1.6 — 2026-06-07*
+- Added One-to-One, One-to-Many, and Many-to-Many relationship examples to README.md.
