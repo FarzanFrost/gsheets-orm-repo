@@ -108,8 +108,8 @@ Reference tables: [REF_developer-reference.md](./REF_developer-reference.md).
 
 | GitHub Secret | Env Var set in CI | Read by |
 |---------------|-------------------|---------|
-| `GOOGLE_CREDENTIALS_JSON` | Written to `/tmp/gsheets_credentials.json`; path exported as `GSHEETS_CREDENTIALS_PATH` | `tests/integration/test_integration.py` |
-| `TEST_SPREADSHEET_ID` | `GSHEETS_SPREADSHEET_ID` | `tests/integration/test_integration.py` |
+| `GOOGLE_CREDENTIALS_JSON` | Written to `/tmp/gsheets_credentials.json`; path exported as `GSHEETS_CREDENTIALS_PATH` | `tests/integration/conftest.py`, `tests/integration/test_integration.py` |
+| `TEST_SPREADSHEET_ID` | `GSHEETS_SPREADSHEET_ID` | `tests/integration/conftest.py`, `tests/integration/test_integration.py` |
 
 ### Running Integration Tests Locally
 
@@ -126,6 +126,7 @@ Without those vars set, integration tests self-skip via `pytestmark`.
 ## Edge Cases
 
 - **Sheet API Rate Limit**: When hit, retry with exponential backoff.
+- **Stale Integration Sheet State**: If an integration test run fails mid-way, `Integration*` worksheets are left in an inconsistent state. The next run will fail for the same reason even after the bug is fixed. Mitigation: `tests/integration/conftest.py` contains a session-scoped `autouse` fixture (`cleanup_integration_sheets`) that deletes all `Integration*` worksheets both before and after every integration test session. It is a no-op when env vars are absent. Never bypass or skip this fixture.
 
 ---
 
