@@ -1,4 +1,5 @@
 import re
+import copy
 from typing import Any, Dict, List, Set, Type, Tuple, Optional
 from gsheets_orm.engine.base import Engine
 from gsheets_orm.engine.dialect import Dialect
@@ -50,6 +51,7 @@ class Session:
         self._dirty: Set[Any] = set()
         self._deleted: Set[Any] = set()
         self._identity_map: Dict[Tuple[Type[Any], Any], Any] = {}
+        self._snapshots: Dict[Tuple[Type[Any], Any], Dict] = {}
 
     def query(self, model_class: Type[Any]) -> Any:
         from gsheets_orm.orm.query import Query
@@ -81,11 +83,25 @@ class Session:
         if pk_val is not None:
             key = (instance.__class__, pk_val)
             self._identity_map[key] = instance
+            # Snapshot original state only on first entry (preserve true original)
+            if key not in self._snapshots:
+                self._snapshots[key] = copy.deepcopy(instance._values)
 
     def get_from_identity_map(self, model_class: Type[Any], pk_value: Any) -> Optional[Any]:
         if pk_value is None:
             return None
         return self._identity_map.get((model_class, pk_value))
+
+    def rollback(self):
+        """Revert all dirty objects to their snapshotted state and clear pending queues."""
+        for instance in list(self._dirty):
+            pk_val = get_pk_value(instance)
+            key = (instance.__class__, pk_val)
+            if key in self._snapshots:
+                instance._values = copy.deepcopy(self._snapshots[key])
+        self._dirty.clear()
+        self._new.clear()
+        self._deleted.clear()
 
     def commit(self):
         # Group changes by model class / table
@@ -120,9 +136,18 @@ class Session:
             # Sort new instances to ensure stable generation order
             for inst in new_instances:
                 # Generate primary keys if missing
-                for pk_name in cls._primary_keys:
+                pk_cols = cls._primary_keys
+                is_composite = len(pk_cols) > 1
+                for pk_name in pk_cols:
                     current_pk_val = getattr(inst, pk_name, None)
                     if current_pk_val is None:
+                        col = cls._columns[pk_name]
+                        if is_composite and col.prefix is None:
+                            raise ValueError(
+                                f"Ambiguous composite PK: column '{pk_name}' on "
+                                f"'{cls.__name__}' is None. Composite PK columns without "
+                                f"a 'prefix' must be supplied explicitly."
+                            )
                         # Extract existing values in the primary key column
                         col_idx = header_map.get(pk_name)
                         existing_values = []
@@ -130,8 +155,7 @@ class Session:
                             for r in sheet_data[1:]:
                                 if col_idx < len(r):
                                     existing_values.append(r[col_idx])
-                        
-                        col = cls._columns[pk_name]
+
                         generated_key = generate_next_key(existing_values, col.prefix)
                         setattr(inst, pk_name, generated_key)
 

@@ -187,3 +187,61 @@ mappings = session.query(StudentCourseMap).filter_by(fr_course_id=course.course_
 students = [m.student for m in mappings]
 ```
 
+## Pagination
+
+You can paginate through large Google Sheets by using `.offset(n)` and `.limit(n)` on your queries.
+
+```python
+# Skip the first 20 records and take the next 10
+page_2 = session.query(Employee).offset(20).limit(10).all()
+```
+
+## Eager Loading
+
+To avoid the N+1 query problem when accessing relationships, use `joinedload` to fetch all related models in a single batched network call.
+
+```python
+from gsheets_orm import joinedload
+
+# Fetches all assignments AND their related Employees in exactly TWO network calls
+assignments = (
+    session.query(Assignment)
+    .options(joinedload(Assignment.employee))
+    .all()
+)
+
+# This loop now hits the in-memory cache and makes no API calls
+for assignment in assignments:
+    print(assignment.employee.name)
+```
+
+## Column Validation
+
+Enforce data integrity natively on assignment before writing to Google Sheets. You can define `min_length`, `max_length`, and `regex` validators on `Column`.
+
+```python
+class ProjectAssignment(Base):
+    __tablename__ = 'Assignments'
+    
+    # Validation Rules
+    role_code = Column(String, min_length=3, max_length=5, regex=r'^[A-Z]+$')
+
+# Raises ValueError("Regex mismatch...") immediately
+assignment = ProjectAssignment(role_code="invalid-role")
+```
+
+## Transactions & Rollback
+
+`Session.rollback()` reverts any uncommitted changes to your models in memory, restoring them to their original state and clearing pending insert/delete queues.
+
+```python
+try:
+    emp = session.query(Employee).filter_by(emp_id="EMP_001").first()
+    emp.name = "New Name"
+    session.add(Employee(name="New Employee"))
+    session.commit()
+except Exception as e:
+    # Reverts emp.name to its original value and clears the new employee from the queue
+    session.rollback()
+    print("Failed to commit, rolled back state.")
+```

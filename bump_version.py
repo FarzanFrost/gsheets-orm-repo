@@ -4,11 +4,11 @@ import re
 from datetime import datetime
 
 def get_current_version():
-    with open("setup.py", "r", encoding="utf-8") as f:
+    with open("pyproject.toml", "r", encoding="utf-8") as f:
         content = f.read()
-    match = re.search(r'version\s*=\s*["\']([^"\']+)["\']', content)
+    match = re.search(r'^version\s*=\s*["\']([^"\']+)["\']', content, re.MULTILINE)
     if not match:
-        raise ValueError("Could not find version in setup.py")
+        raise ValueError("Could not find version in pyproject.toml")
     return match.group(1)
 
 def increment_version(version_str):
@@ -22,13 +22,12 @@ def update_file(filepath, old_version, new_version, today_str):
     if not os.path.exists(filepath):
         print(f"Skipping non-existent file: {filepath}")
         return
-    
+
     with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
-    
-    # Replace version strings
+
     updated_content = content
-    
+
     # Special replacements for AGENTS.md headers/footers
     if "AGENTS.md" in filepath:
         # e.g., # Agent — gsheets-orm (v0.1.0) — 2026-06-06
@@ -57,14 +56,15 @@ def update_file(filepath, old_version, new_version, today_str):
             f'*v{new_version} — {today_str}*',
             updated_content
         )
-    # setup.py version replacement
-    elif filepath == "setup.py":
+    # pyproject.toml version replacement
+    elif filepath == "pyproject.toml":
         updated_content = re.sub(
-            r'version\s*=\s*["\']' + re.escape(old_version) + r'["\']',
-            f'version="{new_version}"',
-            updated_content
+            r'^(version\s*=\s*)["\']' + re.escape(old_version) + r'["\']',
+            f'\\g<1>"{new_version}"',
+            updated_content,
+            flags=re.MULTILINE
         )
-        
+
     if updated_content != content:
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(updated_content)
@@ -78,25 +78,25 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
-        
+
     if len(sys.argv) > 1:
         new_version = sys.argv[1]
     else:
         new_version = increment_version(current_version)
-        
+
     print(f"Bumping version: {current_version} -> {new_version}")
     today_str = datetime.now().strftime("%Y-%m-%d")
-    
+
     # Files to update
-    update_file("setup.py", current_version, new_version, today_str)
+    update_file("pyproject.toml", current_version, new_version, today_str)
     update_file("AGENTS.md", current_version, new_version, today_str)
-    
+
     docs_dir = "docs"
     if os.path.exists(docs_dir):
         for filename in os.listdir(docs_dir):
             if filename.endswith(".md"):
                 update_file(os.path.join(docs_dir, filename), current_version, new_version, today_str)
-                
+
     print("Version bump complete.")
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from gsheets_orm.schema.declarative import Base, clear_registry
-from gsheets_orm.schema.columns import Column
+from gsheets_orm.schema.columns import Column, ForeignKey
 from gsheets_orm.types.core_types import String, Boolean
 from gsheets_orm.orm.query import Query
 
@@ -159,3 +159,55 @@ def test_filter_contains_none_safe():
     results = _make_query(data).filter(Employee.name.contains("BatchUser")).all()
     assert len(results) == 1
     assert results[0].emp_id == "E2"
+
+def test_eager_loading_prevents_n_plus_one(mocker):
+    from gsheets_orm.orm.relationships import relationship
+    from gsheets_orm.orm.joinedload import joinedload
+    
+    class MockAssignment(Base):
+        __tablename__ = "Assignments"
+        id = Column(String, primary_key=True)
+        emp_id = Column(String, ForeignKey("Employee.emp_id"))
+        employee = relationship("Employee")
+        
+    from gsheets_orm.schema.declarative import _registry
+    _registry["Employee"] = Employee
+    
+    mock_session = MagicMock()
+    mock_dialect = MagicMock()
+    mock_session.dialect = mock_dialect
+    mock_session.query.return_value = Query(mock_session, Employee)
+    
+    # Mock read data based on tablename
+    def mock_fetch(tablename):
+        if tablename == "Assignments":
+            return [
+                ["id", "emp_id"],
+                ["A1", "EMP_001"],
+                ["A2", "EMP_002"],
+                ["A3", "EMP_001"]
+            ]
+        elif tablename == "Employee":
+            return [
+                ["emp_id", "name", "role", "is_deleted"],
+                ["EMP_001", "Alice", "ENG", "FALSE"],
+                ["EMP_002", "Bob", "MGR", "FALSE"],
+            ]
+        return []
+        
+    mock_dialect.fetch_worksheet_data.side_effect = mock_fetch
+    mock_session.get_from_identity_map.return_value = None
+    
+    q = Query(mock_session, MockAssignment)
+    
+    # We add options(joinedload())
+    assignments = q.options(joinedload(MockAssignment.employee)).all()
+    
+    assert len(assignments) == 3
+    assert assignments[0].employee is not None
+    assert assignments[0].employee.name == "Alice"
+    assert assignments[1].employee.name == "Bob"
+    assert assignments[2].employee.name == "Alice"
+    
+    # Verify the fetch was called exactly twice (Assignments + Employee), not 1 + N
+    assert mock_dialect.fetch_worksheet_data.call_count == 2

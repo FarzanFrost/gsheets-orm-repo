@@ -9,6 +9,8 @@ class Query:
         self._filters: List[BinaryExpression] = []
         self._filter_by_dict: Dict[str, Any] = {}
         self._limit: Optional[int] = None
+        self._offset_val: int = 0
+        self._eager_loads: List[Any] = []
 
     def filter(self, *expressions: BinaryExpression) -> 'Query':
         for expr in expressions:
@@ -26,6 +28,14 @@ class Query:
 
     def limit(self, n: int) -> 'Query':
         self._limit = n
+        return self
+
+    def offset(self, n: int) -> 'Query':
+        self._offset_val = n
+        return self
+
+    def options(self, *args: Any) -> 'Query':
+        self._eager_loads.extend(args)
         return self
 
     def _matches_filters(self, instance: Any) -> bool:
@@ -144,9 +154,15 @@ class Query:
             if self._matches_filters(instance):
                 filtered_results.append(instance)
 
-        # Apply limit
+        # Apply offset then limit
+        if self._offset_val:
+            filtered_results = filtered_results[self._offset_val:]
         if self._limit is not None:
             filtered_results = filtered_results[:self._limit]
+
+        # Resolve eager loads (must run after slice so the instance list is final)
+        for loader in self._eager_loads:
+            loader.resolve(self.session, filtered_results)
 
         return filtered_results
 

@@ -1,3 +1,4 @@
+import re
 from typing import Any, Optional, Union
 
 class BinaryExpression:
@@ -24,7 +25,10 @@ class Column:
         primary_key: bool = False,
         nullable: bool = True,
         default: Any = None,
-        prefix: Optional[str] = None
+        prefix: Optional[str] = None,
+        min_length: Optional[int] = None,
+        max_length: Optional[int] = None,
+        regex: Optional[str] = None
     ):
         if isinstance(type_class, type):
             self.type = type_class()
@@ -35,6 +39,9 @@ class Column:
         self.nullable = nullable
         self.default = default
         self.prefix = prefix
+        self.min_length = min_length
+        self.max_length = max_length
+        self.regex = regex
         self.name: Optional[str] = None
         self.foreign_key: Optional[ForeignKey] = None
 
@@ -65,9 +72,24 @@ class Column:
 
         # Run cast
         casted_val = self.type.to_python(value)
-        
+
         if casted_val is None and not self.nullable:
             raise ValueError(f"Column '{self.name}' is not nullable")
+
+        if casted_val is not None:
+            str_val = str(casted_val)
+            if self.min_length is not None and len(str_val) < self.min_length:
+                raise ValueError(
+                    f"'{self.name}' too short: {len(str_val)} chars (min {self.min_length})"
+                )
+            if self.max_length is not None and len(str_val) > self.max_length:
+                raise ValueError(
+                    f"'{self.name}' too long: {len(str_val)} chars (max {self.max_length})"
+                )
+            if self.regex is not None and not re.fullmatch(self.regex, str_val):
+                raise ValueError(
+                    f"Regex mismatch for '{self.name}': pattern {self.regex!r} does not match {str_val!r}"
+                )
 
         old_val = instance._values.get(self.name)
         instance._values[self.name] = casted_val

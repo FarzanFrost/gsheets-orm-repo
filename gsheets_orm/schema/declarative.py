@@ -53,6 +53,15 @@ class Base:
         if self._session:
             self._session._mark_dirty(self)
 
+    def get_pk_value(self) -> Any:
+        """Return the primary key value: single value for single PK, tuple for composite PK."""
+        pks = self._primary_keys
+        if not pks:
+            return None
+        if len(pks) == 1:
+            return getattr(self, pks[0], None)
+        return tuple(getattr(self, pk, None) for pk in pks)
+
     def __repr__(self) -> str:
         pk_str = ", ".join(f"{pk}={getattr(self, pk, None)}" for pk in self._primary_keys)
         return f"<{self.__class__.__name__}({pk_str})>"

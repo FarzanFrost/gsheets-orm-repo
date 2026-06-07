@@ -1,6 +1,9 @@
 from typing import Any, Optional, Type
 from gsheets_orm.exceptions import SessionError
 
+# Sentinel used to distinguish "not set" from an explicit None value.
+_UNSET = object()
+
 class RelationshipDescriptor:
     def __init__(self, target_model_name: str, back_populates: Optional[str] = None):
         self.target_model_name = target_model_name
@@ -13,6 +16,13 @@ class RelationshipDescriptor:
     def __get__(self, instance: Any, owner: Any) -> Any:
         if instance is None:
             return self
+
+        # Short-circuit: return any value eagerly loaded by JoinedLoad
+        if not hasattr(instance, '_values'):
+            instance._values = {}
+        eager_val = instance._values.get(self.name, _UNSET)
+        if eager_val is not _UNSET:
+            return eager_val
 
         # Retrieve target model class from registry
         from gsheets_orm.schema.declarative import get_registered_models

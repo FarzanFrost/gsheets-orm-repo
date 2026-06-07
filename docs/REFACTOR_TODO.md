@@ -29,12 +29,12 @@
 
 ## 🧊 Phase 3: Backlog
 
-- [ ] **Composite primary keys**: `get_pk_value` returns a tuple but `generate_next_key` only handles single columns.
-- [ ] **Eager loading**: Add `joinedload()` / `contains_eager()` option to `Query` to batch-fetch relations in one round trip.
-- [ ] **Pagination**: Add `.offset(n)` to `Query` for cursor-based paging over large sheets.
-- [ ] **Column-level validation**: `nullable=False` is enforced on set, but no `min_length`, `max_length`, or regex validators exist yet.
-- [ ] **Session rollback**: `Session.rollback()` not implemented — currently the only recovery path is re-instantiating the session.
-- [ ] **Deprecate `setup.py`**: Migrate from `setup.py` to `pyproject.toml`-only build when Python 3.8 support is dropped.
+- [x] **Composite primary keys**: `get_pk_value` returns a tuple but `generate_next_key` only handles single columns.
+- [x] **Eager loading**: Add `joinedload()` / `contains_eager()` option to `Query` to batch-fetch relations in one round trip.
+- [x] **Pagination**: Add `.offset(n)` to `Query` for cursor-based paging over large sheets.
+- [x] **Column-level validation**: `nullable=False` is enforced on set, but no `min_length`, `max_length`, or regex validators exist yet.
+- [x] **Session rollback**: `Session.rollback()` not implemented — currently the only recovery path is re-instantiating the session.
+- [x] **Deprecate `setup.py`**: Migrate from `setup.py` to `pyproject.toml`-only build when Python 3.8 support is dropped.
 
 ---
 

@@ -4,6 +4,7 @@ from gsheets_orm.types.core_types import String, Integer, Float, Boolean, DateTi
 from gsheets_orm.engine.base import create_engine
 from gsheets_orm.orm.session import Session
 from gsheets_orm.orm.relationships import relationship
+from gsheets_orm.orm.joinedload import joinedload
 
 __all__ = [
     "Base",
@@ -16,5 +17,6 @@ __all__ = [
     "DateTime",
     "create_engine",
     "Session",
-    "relationship"
+    "relationship",
+    "joinedload",
 ]
