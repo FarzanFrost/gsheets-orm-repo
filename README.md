@@ -82,11 +82,15 @@ if developer.department:
 ### 5. Update and Delete Records
 Modify attributes directly on the objects or mark them for deletion.
 
+**Soft Delete vs. Hard Delete:**
+- **Soft Delete**: If a model defines an `is_deleted = Column(Boolean, default=False)` column, `session.delete(instance)` sets `is_deleted` to `True` upon commit. Queries (`session.query(...)`) will automatically exclude these records unless `is_deleted` is explicitly queried.
+- **Hard Delete**: If the model does not define an `is_deleted` column, calling `session.delete(instance)` clears the row's values (replaces them with empty strings) upon commit.
+
 ```python
 # Update
 developer.salary += 5000.0
 
-# Soft Delete
+# Soft Delete (or Hard Delete depending on schema)
 bad_employee = session.query(Employee).filter_by(emp_id="EMP_002").first()
 if bad_employee:
     session.delete(bad_employee)
