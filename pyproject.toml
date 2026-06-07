@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gsheets-orm"
-version = "0.1.7"
+version = "0.1.8"
 description = "A lightweight Object-Relational Mapper (ORM) backed by Google Sheets"
 readme = "README.md"
 license = { text = "MIT" }

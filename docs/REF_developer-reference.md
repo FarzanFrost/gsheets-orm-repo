@@ -33,9 +33,9 @@
 
 | Item | Detail |
 |------|--------|
-| Source of truth | `setup.py` |
+| Source of truth | `pyproject.toml` |
 | Bump command | `python bump_version.py` |
-| Files auto-updated | `setup.py`, `AGENTS.md`, `docs/*.md` |
+| Files auto-updated | `pyproject.toml`, `AGENTS.md`, `docs/*.md` |
 
 ### Google Sheets API Reference
 
@@ -47,4 +47,4 @@
 
 ---
 
-*v0.1.7 — 2026-06-07*
+*v0.1.8 — 2026-06-07*
