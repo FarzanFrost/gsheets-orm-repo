@@ -83,4 +83,4 @@ Use one file as the source of truth for each rule group.
 
 ---
 
-*v0.1.3 — 2026-06-07*
+*v0.1.4 — 2026-06-07*
