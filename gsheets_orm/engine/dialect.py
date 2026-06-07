@@ -4,7 +4,7 @@ from gspread.exceptions import APIError, WorksheetNotFound
 from gsheets_orm.engine.base import Engine
 from gsheets_orm.exceptions import DialectError
 
-def retry_on_rate_limit(max_retries: int = 5, initial_backoff: float = 1.0):
+def retry_on_rate_limit(max_retries: int = 8, initial_backoff: float = 2.0):
     def decorator(func):
         def wrapper(*args, **kwargs):
             backoff = initial_backoff
@@ -43,7 +43,7 @@ class Dialect:
                 title=worksheet_name, rows=1000, cols=26
             )
 
-    @retry_on_rate_limit()
+    @retry_on_rate_limit(max_retries=8, initial_backoff=2.0)
     def fetch_worksheet_data(self, worksheet_name: str) -> List[List[str]]:
         try:
             worksheet = self.engine.spreadsheet.worksheet(worksheet_name)
@@ -55,7 +55,7 @@ class Dialect:
         except Exception as e:
             raise DialectError(f"Failed to fetch worksheet '{worksheet_name}': {e}")
 
-    @retry_on_rate_limit()
+    @retry_on_rate_limit(max_retries=8, initial_backoff=2.0)
     def append_rows(self, worksheet_name: str, rows: List[List[Any]]):
         if not rows:
             return
@@ -67,7 +67,7 @@ class Dialect:
         except Exception as e:
             raise DialectError(f"Failed to append rows to worksheet '{worksheet_name}': {e}")
 
-    @retry_on_rate_limit()
+    @retry_on_rate_limit(max_retries=8, initial_backoff=2.0)
     def batch_update(self, worksheet_name: str, updates: List[Dict[str, Any]]):
         if not updates:
             return

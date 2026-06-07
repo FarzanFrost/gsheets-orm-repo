@@ -50,7 +50,7 @@
 
 ## Edge Cases
 
-- **Rate Limit Exhaustion**: `dialect.py` retries with exponential backoff (max 5 attempts) on HTTP 429. **Invariant**: any method decorated with `@retry_on_rate_limit` must `raise` `APIError` directly — never catch and re-wrap it as `DialectError`. Wrapping defeats the decorator's `except APIError` branch and silently disables retry.
+- **Rate Limit Exhaustion**: `dialect.py` retries with exponential backoff (max 8 attempts) on HTTP 429. **Invariant**: any method decorated with `@retry_on_rate_limit` must `raise` `APIError` directly — never catch and re-wrap it as `DialectError`. Wrapping defeats the decorator's `except APIError` branch and silently disables retry.
 - **Missing Worksheet**: `commit()` writes headers first if `fetch_worksheet_data` returns empty.
 - **Concurrent Overwrites**: `Session` performs read-before-write to resolve row numbers. No lock is held — last writer wins.
 - **Circular Relations**: `RelationshipDescriptor` does not detect cycles. Circular `relationship()` definitions will cause infinite recursion. See `STANDARDS_interface.md`.
