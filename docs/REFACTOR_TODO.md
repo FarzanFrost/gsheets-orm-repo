@@ -23,6 +23,7 @@
 - [x] Integration test scaffold with env-var skip guard
 - [x] CI pipeline wired: `unit-tests` (3.8–3.12) + `integration-tests` (3.11) jobs; secrets `GOOGLE_CREDENTIALS_JSON` / `TEST_SPREADSHEET_ID` mapped to env vars
 - [x] Integration test scenarios expanded: 1:M (lazy loading), M:N (mapping table), self-referencing FK, batch commit across 3 sheets (`test_integration.py`)
+- [x] Fixed `@retry_on_rate_limit` decorator bypass — dialect methods now re-raise `APIError` directly instead of wrapping it as `DialectError` (`engine/dialect.py`)
 
 ---
 
@@ -44,4 +45,4 @@
 
 ---
 
-*v0.1.4 — 2026-06-07*
+*v0.1.5 — 2026-06-07*

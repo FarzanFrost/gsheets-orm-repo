@@ -50,8 +50,8 @@ class Dialect:
             return worksheet.get_all_values()
         except WorksheetNotFound:
             return []
-        except DialectError:
-            raise
+        except APIError:
+            raise  # Let retry decorator handle 429 / other API errors
         except Exception as e:
             raise DialectError(f"Failed to fetch worksheet '{worksheet_name}': {e}")
 
@@ -62,8 +62,8 @@ class Dialect:
         try:
             worksheet = self._get_or_create_worksheet(worksheet_name)
             worksheet.append_rows(rows, value_input_option="USER_ENTERED")
-        except DialectError:
-            raise
+        except APIError:
+            raise  # Let retry decorator handle 429 / other API errors
         except Exception as e:
             raise DialectError(f"Failed to append rows to worksheet '{worksheet_name}': {e}")
 
@@ -75,7 +75,7 @@ class Dialect:
             worksheet = self.engine.spreadsheet.worksheet(worksheet_name)
             # data is a list of updates, e.g. [{"range": "A2:C2", "values": [[...]]}]
             worksheet.batch_update(updates, value_input_option="USER_ENTERED")
-        except DialectError:
-            raise
+        except APIError:
+            raise  # Let retry decorator handle 429 / other API errors
         except Exception as e:
             raise DialectError(f"Failed to run batch updates on worksheet '{worksheet_name}': {e}")
