@@ -2,6 +2,7 @@ import os
 import pytest
 import gspread
 from google.oauth2 import service_account
+from gsheets_orm import create_engine, Session
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -59,3 +60,12 @@ def cleanup_integration_sheets():
 
     # --- Post-test cleanup ---
     _delete_integration_worksheets(spreadsheet)
+
+
+@pytest.fixture
+def live_session():
+    creds_path = os.getenv("GSHEETS_CREDENTIALS_PATH")
+    spreadsheet_id = os.getenv("GSHEETS_SPREADSHEET_ID")
+    uri = f"gsheets://{creds_path}?spreadsheet_id={spreadsheet_id}"
+    engine = create_engine(uri)
+    return Session(engine)
